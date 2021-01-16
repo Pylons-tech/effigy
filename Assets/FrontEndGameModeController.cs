@@ -5,16 +5,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class FrontEndBattleController : MonoBehaviour
+public class FrontEndGameModeController : MonoBehaviour
 {
+    public const int LOAD_FIRST_SCENE = 0;
     public const int FRONT_END_SCENE = 1;
+    public const int MAP_SCENE = 2;
     public const int BATTLE_SCENE = 3;
-    public const string BATTLE_SCENE_ROOT_TAG = "Battle Scene Root";
     
     private bool BattleSceneIsLoaded => SceneManager.GetSceneByBuildIndex(BATTLE_SCENE).isLoaded;
     private Battle lastBattle;
 
-    public static FrontEndBattleController Instance { get; private set; }
+    public static FrontEndGameModeController Instance { get; private set; }
 
     void Awake ()
     {

@@ -21,7 +21,7 @@ public class CombatUi : MonoBehaviour
     void Update ()
     {
         if (SemaphoreCount < 1 && pendingEvents.Count > 0) UpdateCombatUi(this, GetHighestPriorityPendingEvent());
-        if (pendingEvents.Count == 0 && SemaphoreCount == 0 && CombatHost.Instance.current.Ended) FrontEndBattleController.Instance.ReturnFromCombat();
+        if (pendingEvents.Count == 0 && SemaphoreCount == 0 && CombatHost.Instance.current.Ended) FrontEndGameModeController.Instance.ReturnFromCombat();
     }
 
     private CombatUiEvent GetHighestPriorityPendingEvent()
