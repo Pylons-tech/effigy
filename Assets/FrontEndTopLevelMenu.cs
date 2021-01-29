@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class FrontEndTopLevelMenu : MonoBehaviour
 {
+    private FrontEndInventoryMenu.InventoryMenuMode inventoryMenuMode;
+
     public static FrontEndTopLevelMenu Instance { get; private set; }
 
     void Awake ()
@@ -20,4 +22,11 @@ public class FrontEndTopLevelMenu : MonoBehaviour
     {
         gameObject.SetActive(true);
     }
+
+    public void SetTestMenuInventoryMode (int mode)
+    {
+        inventoryMenuMode = (FrontEndInventoryMenu.InventoryMenuMode)mode;
+    }
+
+    public void OpenInventoryMenuFromTestMenu() => FrontEndInventoryMenu.Instance.Open(inventoryMenuMode);
 }

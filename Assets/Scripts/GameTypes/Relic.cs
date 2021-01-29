@@ -29,7 +29,6 @@ namespace GameTypes
         public int Mana { get; private set; }
         public int Level { get; private set; }
        
-
         public static Relic GenerateRelicForEnemyLevel (int enemyLevel)
         {
             var relicLevel = 1 + (Mathf.FloorToInt(enemyLevel / 5));

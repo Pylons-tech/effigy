@@ -6,6 +6,16 @@ using UnityEngine.UIElements;
 
 public class FrontEndInventoryMenu : MonoBehaviour
 {
+    public enum InventoryMenuMode
+    {
+        ViewItems = 0,
+        MakingTrade = 1,
+        FulfillingTrade = 2,
+        FeedingPuppets = 3
+    }
+
+    public InventoryMenuMode Mode { get; private set; }
+
     public static FrontEndInventoryMenu Instance { get; private set; }
     public FrontEndInventoryItemPanel Prototype;
     public ScrollView ScrollView;
@@ -21,13 +31,13 @@ public class FrontEndInventoryMenu : MonoBehaviour
 
     void Start()
     {
-        Open();
+        Open(InventoryMenuMode.FeedingPuppets);
     }
 
-    public void Open()
+    public void Open(InventoryMenuMode mode)
     {
         gameObject.SetActive(true);
-
+        Mode = mode;
         PopulateList(new Relic[] { new Relic("", 0, 0, 0, 0, 0, 0, 0, 0, 0), new Relic("", 0, 0, 0, 0, 0, 0, 0, 0, 0), new Relic("", 0, 0, 0, 0, 0, 0, 0, 0, 0) });
     }
 

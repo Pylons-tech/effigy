@@ -7,11 +7,6 @@ public class FrontEndLoader : MonoBehaviour
 
     void Start()
     {
-        SceneManager.LoadScene(FRONT_END_SCENE, LoadSceneMode.Additive);
-    }
-
-    void Update()
-    {
-        
+        if (!SceneManager.GetSceneAt(FRONT_END_SCENE).isLoaded) SceneManager.LoadScene(FRONT_END_SCENE, LoadSceneMode.Additive);
     }
 }

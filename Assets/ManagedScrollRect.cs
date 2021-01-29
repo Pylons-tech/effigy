@@ -26,11 +26,6 @@ public class ManagedScrollRect : MonoBehaviour
         scrollRect = GetComponent<ScrollRect>();
     }
 
-    private void GetPrototype()
-    {
-
-    }
-
     private void RecalculateScrollRectBoundsAndChildPositions ()
     {
         var st = ScrollType.None;
@@ -63,9 +58,9 @@ public class ManagedScrollRect : MonoBehaviour
             rt.anchoredPosition = prevElementsSpacing;
             var dimensions = ChildElements[i].GetElementDimensions();
             if (st.HasFlag(ScrollType.Horizontal)) prevElementsSpacing.x += dimensions.x + Padding.x;
-            if (st.HasFlag(ScrollType.Vertical)) prevElementsSpacing.y += dimensions.y + Padding.y;
+            if (st.HasFlag(ScrollType.Vertical)) prevElementsSpacing.y -= dimensions.y + Padding.y;
+            ChildElements[i].gameObject.SetActive(true);
         }
-
         scrollRect.content.sizeDelta = size;
     }
 
