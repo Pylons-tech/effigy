@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+/// <summary>
+/// TO-DO: I wrote that whole Menu class b/c it'd
+/// make the relationship we need between inventory and character menus
+/// easier, so let's actually implement it here now.
+/// </summary>
 public class FrontEndInventoryMenu : MonoBehaviour
 {
     public enum InventoryMenuMode
