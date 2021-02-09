@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class ManagedScrollRect : MonoBehaviour
 {
+    public MenuSystem MenuSystem { get; private set; }
+
     [Flags]
     private enum ScrollType
     {
@@ -24,6 +26,7 @@ public class ManagedScrollRect : MonoBehaviour
     void Awake ()
     {
         scrollRect = GetComponent<ScrollRect>();
+        MenuSystem = MenuSystem.Get(gameObject.scene);
     }
 
     private void RecalculateScrollRectBoundsAndChildPositions ()

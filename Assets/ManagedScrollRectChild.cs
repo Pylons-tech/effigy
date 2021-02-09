@@ -2,9 +2,12 @@
 
 public abstract class ManagedScrollRectChild : MonoBehaviour
 {
+    public ManagedScrollRect Parent { get; private set; }
+
     [ExecuteAlways]
     void Awake()
     {
+        Parent = GetComponentInParent<ManagedScrollRect>();
         // Ensures anchor point is in rect's top left corner - constant anchor point greatly simplifies the way element placement would otherwise have to work
         if ((transform as RectTransform).anchorMin != Vector2.up) (transform as RectTransform).anchorMin = Vector2.up;
         if ((transform as RectTransform).anchorMax != Vector2.up) (transform as RectTransform).anchorMax = Vector2.up;

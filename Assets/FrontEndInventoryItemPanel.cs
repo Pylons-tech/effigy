@@ -1,13 +1,13 @@
 ﻿using GameTypes;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class FrontEndInventoryItemPanel : ManagedScrollRectChild
 {
+    private FrontEndInventoryMenu menu;
+
     public RectTransform Panel;
     public TextMeshProUGUI RelicName;
     public TextMeshProUGUI RelicHP;
@@ -24,6 +24,7 @@ public class FrontEndInventoryItemPanel : ManagedScrollRectChild
 
     public override void ConformToData(object data)
     {
+        if (menu == null) menu = Parent.MenuSystem.GetMenu<FrontEndInventoryMenu>();
         var r = data as Relic;
         RelicName.text = r.Name;
         RelicHP.text = r.HP.ToString();
@@ -36,7 +37,7 @@ public class FrontEndInventoryItemPanel : ManagedScrollRectChild
         RelicLight.text = r.LightPts.ToString();
         RelicEarth.text = r.EarthPts.ToString();
 
-        switch (FrontEndInventoryMenu.Instance.Mode)
+        switch (menu.Mode)
         {
             case FrontEndInventoryMenu.InventoryMenuMode.FeedingPuppets:
                 UseButton.gameObject.SetActive(true);

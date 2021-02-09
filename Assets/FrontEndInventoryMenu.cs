@@ -1,6 +1,5 @@
 ﻿using GameTypes;
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,7 +8,7 @@ using UnityEngine.UIElements;
 /// make the relationship we need between inventory and character menus
 /// easier, so let's actually implement it here now.
 /// </summary>
-public class FrontEndInventoryMenu : MonoBehaviour
+public class FrontEndInventoryMenu : Menu
 {
     public enum InventoryMenuMode
     {
@@ -20,39 +19,33 @@ public class FrontEndInventoryMenu : MonoBehaviour
     }
 
     public InventoryMenuMode Mode { get; private set; }
-
-    public static FrontEndInventoryMenu Instance { get; private set; }
     public FrontEndInventoryItemPanel Prototype;
     public ScrollView ScrollView;
     public RectTransform ContentRoot;
     public float Spacing;
     public ManagedScrollRect ManagedScrollRect;
+    // todo: ???
+    private readonly static ModeDescriptor[] _ModeDescriptorTable = new ModeDescriptor[]
+    {
+        new ModeDescriptor(OnOpenFocusBehavior.TakeFocus, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one),
+        new ModeDescriptor(OnOpenFocusBehavior.TakeFocus, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one),
+        new ModeDescriptor(OnOpenFocusBehavior.TakeFocus, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one),
+        new ModeDescriptor(OnOpenFocusBehavior.TakeFocus, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one)
+    };
 
     void Awake()
     {
-        Instance = this;
-        Prototype.gameObject.SetActive(false);
+        base.Awake();
     }
 
-    void Start()
-    {
-        Open(InventoryMenuMode.FeedingPuppets);
-    }
-
-    public void Open(InventoryMenuMode mode)
-    {
-        gameObject.SetActive(true);
-        Mode = mode;
-        PopulateList(new Relic[] { new Relic("", 0, 0, 0, 0, 0, 0, 0, 0, 0), new Relic("", 0, 0, 0, 0, 0, 0, 0, 0, 0), new Relic("", 0, 0, 0, 0, 0, 0, 0, 0, 0) });
-    }
-
-    public void Close()
-    {
-        gameObject.SetActive(false);
-    }
-
-    public void PopulateList (Relic[] relics)
+    private void PopulateList (Relic[] relics)
     {
         ManagedScrollRect.PopulateList(relics);
+    }
+
+    protected override void OnModeChanged<T>(T previousMode)
+    {
+        Debug.Log("Implement mode switch behavior for inventory menu please");
+        return;
     }
 }

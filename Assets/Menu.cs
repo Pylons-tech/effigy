@@ -18,59 +18,12 @@ using UnityEngine;
 public abstract class Menu : MonoBehaviour
 {
     /// <summary>
-    /// Attribute that must be attached to all Menu instances.
-    /// Specifies the way this menu's mode transitions work.
-    /// </summary>
-    public class MenuAttribute : Attribute
-    {
-        public readonly ModeDescriptor[] Modes;
-        public readonly Enum ModeEnum;
-
-        public MenuAttribute(ModeDescriptor[] modes, Enum modeEnum)
-        {
-            Modes = modes;
-            ModeEnum = modeEnum;
-        }
-    }
-
-    /// <summary>
-    /// Specifies focus-on-open behavior and rect position/size data for
-    /// a menu mode.
-    /// </summary>
-    public readonly struct ModeDescriptor
-    {
-        public readonly OnOpenFocusBehavior OnOpenFocusBehavior;
-        public readonly Vector2 AnchorMin;
-        public readonly Vector2 AnchorMax;
-        public readonly Vector2 AnchoredPosition;
-        public readonly Vector2 SizeDelta;
-
-        public ModeDescriptor(OnOpenFocusBehavior onOpenFocusBehavior, Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, Vector2 sizeDelta)
-        {
-            OnOpenFocusBehavior = onOpenFocusBehavior;
-            AnchorMin = anchorMin;
-            AnchorMax = anchorMax;
-            AnchoredPosition = anchoredPosition;
-            SizeDelta = sizeDelta;
-        }
-    }
-
-    /// <summary>
-    /// TakeFocus: when menu is opened, automatically grabs focus from all existing menus.
-    /// ShareFocus: when menu is opened, joins the active focus frame.
-    /// </summary>
-    public enum OnOpenFocusBehavior
-    {
-        None = 0,
-        TakeFocus = 1,
-        ShareFocus = 2
-    }
-
-    /// <summary>
     /// Data class used to track the focus hierarchy of open menus.
     /// </summary>
     public class Frame
     {
+        private readonly MenuSystem _menuSystem;
+
         /// <summary>
         /// The list of menus occupying this frame. Don't
         /// modify this directly - use Frame.Add() and Frame.Remove()
@@ -82,8 +35,9 @@ public abstract class Menu : MonoBehaviour
         /// Create a new frame. m must contain at least one object, or this
         /// will throw an exception.
         /// </summary>
-        public Frame (params Menu[] m)
+        public Frame(MenuSystem ms, params Menu[] m)
         {
+            _menuSystem = ms;
             if (m.Length == 0) throw new Exception("Can't create an empty focus frame");
             foreach (var menu in m)
             {
@@ -99,8 +53,8 @@ public abstract class Menu : MonoBehaviour
         /// </summary>
         public void TakeFocus()
         {
-            FocusStack.Remove(this);
-            FocusStack.AddLast(this);
+            _menuSystem.RemoveFromFocusStack(this);
+            _menuSystem.AddToTopOfFocusStack(this);
         }
 
         /// <summary>
@@ -139,36 +93,63 @@ public abstract class Menu : MonoBehaviour
                 Menus.Remove(menu);
                 menu._frame = null;
             }
-            if (Menus.Count == 0) FocusStack.Remove(this);
-        }
-
-        /// <summary>
-        /// The frame on top of the focus stack, assuming it is not empty.
-        /// Null if so.
-        /// </summary>
-        public static Frame Current
-        {
-            get
-            {
-                if (FocusStack.Count > 0) return FocusStack.Last.Value;
-                else return null;
-            }
+            if (Menus.Count == 0) _menuSystem.RemoveFromFocusStack(this);
         }
     }
+
+    /// <summary>
+    /// TakeFocus: when menu is opened, automatically grabs focus from all existing menus.
+    /// ShareFocus: when menu is opened, joins the active focus frame.
+    /// </summary>
+    public enum OnOpenFocusBehavior
+    {
+        None = 0,
+        TakeFocus = 1,
+        ShareFocus = 2
+    }
+
+    /// <summary>
+    /// Specifies focus-on-open behavior and rect position/size data for
+    /// a menu mode.
+    /// </summary>
+    public readonly struct ModeDescriptor
+    {
+        public readonly OnOpenFocusBehavior OnOpenFocusBehavior;
+        public readonly Vector2 AnchorMin;
+        public readonly Vector2 AnchorMax;
+        public readonly Vector2 AnchoredPosition;
+        public readonly Vector2 SizeDelta;
+
+        public ModeDescriptor(OnOpenFocusBehavior onOpenFocusBehavior, Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, Vector2 sizeDelta)
+        {
+            OnOpenFocusBehavior = onOpenFocusBehavior;
+            AnchorMin = anchorMin;
+            AnchorMax = anchorMax;
+            AnchoredPosition = anchoredPosition;
+            SizeDelta = sizeDelta;
+        }
+    }
+
+    /// <summary>
+    /// An enumeration used to specify each mode this menu can operate in.
+    /// </summary>
+    public Type ModeEnum;
+    /// <summary>
+    /// ModeDescriptors corresponding to each mode specified by this menu's ModeEnum.
+    /// </summary>
+    public ModeDescriptor[] ModeDescriptorTable;
+    /// <summary>
+    /// If IsBaseMenu is true, this menu will be open and focused as its default state when
+    /// the parent MenuSystem is setting up; otherwise, it'll be closed.
+    /// </summary>
+    public bool IsBaseMenu;
 
     /// <summary>
     /// The Frame this menu occupies. Don't update this manually; use Frame.Add() and Frame.Remove().
     /// </summary>
     private Frame _frame;
+    protected MenuSystem menuSystem;
 
-    /// <summary>
-    /// ModeDescriptors corresponding to each mode specified by this menu's ModeEnum.
-    /// </summary>
-    private ModeDescriptor[] ModeDescriptorTable;
-    /// <summary>
-    /// An enumeration used to specify each mode this menu can operate in.
-    /// </summary>
-    private Enum ModeEnum;
     /// <summary>
     /// The ModeDescriptor for this menu's current mode.
     /// This is virtual to enable NonModalMenu to override it in order to provide sane
@@ -191,42 +172,26 @@ public abstract class Menu : MonoBehaviour
     public RectTransform rectTransform { get; private set; }
 
     /// <summary>
-    /// Linked list (not a stack, despite the name - we need to shuffle the order of these around frequently; it's a "stack"
-    /// in that lower items are "on top of" higher ones) used to track the relationships between menus and which ones have focus right noow.
+    /// Right now we have to manually call base.Awake() here. Is there a way to get around this?
     /// </summary>
-    private static LinkedList<Frame> FocusStack = new LinkedList<Frame>();
-
     protected virtual void Awake ()
     {
         rectTransform = transform as RectTransform;
-        foreach (var attr in GetType().GetCustomAttributes(false))
-        {
-            if (attr.GetType() == typeof(MenuAttribute))
-            {
-                ModeDescriptorTable = (attr as MenuAttribute).Modes;
-                ModeEnum = (attr as MenuAttribute).ModeEnum;
-                break;
-            }
-        }
     }
 
     /// <summary>
     /// Take focus by joining the current active focus frame.
     /// This means you don't unfocus anything presently in focus.
     /// </summary>
-    public void TakeFocusJoinFrame()
-    {
-        FocusStack.Last.Value.Add(this);
-    }
+    public void TakeFocusJoinFrame() => menuSystem.CurrentFocusFrame?.Add(this);
 
     /// <summary>
     /// Take focus by creating a new focus frame, unfocusing anything
     /// presently in focus.
     /// </summary>
-    public void TakeFocusNewFrame()
-    {
-        FocusStack.AddLast(new Frame(this));
-    }
+    public void TakeFocusNewFrame() => menuSystem.AddToTopOfFocusStack(new Frame(menuSystem, this));
+
+    public void Pair(MenuSystem ms) => menuSystem = ms;
 
     /// <summary>
     /// Change menu's operating mode.
@@ -272,6 +237,6 @@ public abstract class Menu : MonoBehaviour
     }
 
     public bool HasFocus {
-        get => _frame != null && _frame == FocusStack.Last?.Value;
+        get => _frame != null && _frame == menuSystem.CurrentFocusFrame;
     }
 }

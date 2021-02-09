@@ -2,25 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FrontEndTopLevelMenu : MonoBehaviour
+public class FrontEndTopLevelMenu : NonModalMenu
 {
     private FrontEndInventoryMenu.InventoryMenuMode inventoryMenuMode;
 
-    public static FrontEndTopLevelMenu Instance { get; private set; }
-
     void Awake ()
     {
-        Instance = this;
-    }
-
-    public void Close()
-    {
-        gameObject.SetActive(false);
-    }
-
-    public void Open()
-    {
-        gameObject.SetActive(true);
+        base.Awake();
     }
 
     public void SetTestMenuInventoryMode (int mode)
@@ -28,5 +16,5 @@ public class FrontEndTopLevelMenu : MonoBehaviour
         inventoryMenuMode = (FrontEndInventoryMenu.InventoryMenuMode)mode;
     }
 
-    public void OpenInventoryMenuFromTestMenu() => FrontEndInventoryMenu.Instance.Open(inventoryMenuMode);
+    public void OpenInventoryMenuFromTestMenu() => menuSystem.OpenMenu<FrontEndInventoryMenu, FrontEndInventoryMenu.InventoryMenuMode>(inventoryMenuMode);
 }
