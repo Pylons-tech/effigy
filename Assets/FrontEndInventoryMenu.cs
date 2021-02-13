@@ -48,4 +48,13 @@ public class FrontEndInventoryMenu : Menu
         Debug.Log("Implement mode switch behavior for inventory menu please");
         return;
     }
+
+    protected override ModeDescriptor[] EmitModeDescriptors()
+    {
+        return new ModeDescriptor[] { new ModeDescriptor(OnOpenFocusBehavior.TakeFocus, rectTransform.anchorMin, rectTransform.anchorMax, rectTransform.anchoredPosition, rectTransform.sizeDelta),
+        new ModeDescriptor(OnOpenFocusBehavior.TakeFocus, rectTransform.anchorMin, rectTransform.anchorMax, rectTransform.anchoredPosition, rectTransform.sizeDelta),
+        new ModeDescriptor(OnOpenFocusBehavior.TakeFocus, rectTransform.anchorMin, rectTransform.anchorMax, rectTransform.anchoredPosition, rectTransform.sizeDelta),
+        new ModeDescriptor(OnOpenFocusBehavior.TakeFocus, rectTransform.anchorMin, rectTransform.anchorMax, rectTransform.anchoredPosition, rectTransform.sizeDelta)};
+        throw new NotImplementedException();
+    }
 }

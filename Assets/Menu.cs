@@ -239,4 +239,10 @@ public abstract class Menu : MonoBehaviour
     public bool HasFocus {
         get => _frame != null && _frame == menuSystem.CurrentFocusFrame;
     }
+
+    /// <summary>
+    /// HACK: Eventually, we want to be using Unity serialization and a custom
+    /// editor for this.
+    /// </summary>
+    protected abstract ModeDescriptor[] EmitModeDescriptors();
 }

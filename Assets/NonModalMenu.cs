@@ -18,4 +18,9 @@ public class NonModalMenu : Menu
 
     public override ModeDescriptor CurrentModeDescriptor =>
         new ModeDescriptor(DefaultOnOpenFocusBehavior, rectTransform.anchorMin, rectTransform.anchorMax, rectTransform.anchoredPosition, rectTransform.sizeDelta);
+
+    protected override ModeDescriptor[] EmitModeDescriptors()
+    {
+        return new ModeDescriptor[] { new ModeDescriptor(DefaultOnOpenFocusBehavior, rectTransform.anchorMin, rectTransform.anchorMax, rectTransform.anchoredPosition, rectTransform.sizeDelta)};
+    }
 }
